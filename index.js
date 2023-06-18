@@ -18,16 +18,17 @@ app.use((req, res, next) => {
   ) {
     next();
   } else {
+    console.log(req.headers.authorization);
     if (req.headers.authorization) {
       let token = req.headers.authorization.split(" ")[1];
       try {
-        jwt.verify(token, process.env.privateKey);
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         next();
       } catch (error) {
-        res.json({ msg: "Hayırdır komşu nereye böyle..." });
+        res.json({ msg: "You don't have access..." });
       }
     } else {
-      res.json({ msg: "Hayırdır komşu nereye böyle..." });
+      res.json({ msg: "You don't have access..." });
     }
   }
 });
