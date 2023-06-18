@@ -41,11 +41,14 @@ const registirationController = {
           if (!validPassword) {
             return res.status(401).json({ message: "Invalid password" });
           }
+          if (!user.isVerified) {
+            return res.status(401).json({ message: "Email is not verified" });
+          }
           const accessToken = jwt.sign(
             { email: req.body.email },
             process.env.ACCESS_TOKEN_SECRET
           );
-          res.json({ accessToken: accessToken });
+          res.json({ userId: user._id, accessToken: accessToken });
         } else {
           res.status(401).json({ message: "User Not Found" });
         }
@@ -76,6 +79,9 @@ const registirationController = {
     User.findOne({ email: req.body.email })
       .then(async (user) => {
         if (user) {
+          if (!user.isVerified) {
+            return res.status(401).json({ message: "Email is not verified" });
+          }
           const randomCode = Math.floor(1000 + Math.random() * 9000);
           user.verificationCode = randomCode;
           user.save();
